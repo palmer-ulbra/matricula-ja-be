@@ -93,25 +93,17 @@ rotas.get('/turmas', async (req, res) => {
   const curso = typeof req.query.curso === 'string' ? req.query.curso : null;
 
   const { rows: turmas } = await db.query(
-    `select t.* from turma t
+    `select t.*, json_build_object('codigo', d.codigo, 'nome', d.nome, 'creditos', d.creditos) as disciplina
+       from turma t
        join periodo_letivo p on p.id = t.periodo_letivo_id and p.ativo
-      where exists (
-        select 1 from disciplina d
-         where d.id = t.disciplina_id
-           and ($1::text is null or d.curso = $1)
-           and ($2::text is null or d.codigo ilike $2 or d.nome ilike $2 or t.codigo ilike $2)
-      )
+       join disciplina d on d.id = t.disciplina_id
+      where ($1::text is null or d.curso = $1)
+        and ($2::text is null or d.codigo ilike $2 or d.nome ilike $2 or t.codigo ilike $2)
       order by t.codigo limit $3 offset $4`,
     [curso, busca, tamanho, offset],
   );
 
-  const itens = [];
-  for (const t of turmas) {
-    const { rows } = await db.query('select codigo, nome, creditos from disciplina where id = $1', [
-      t.disciplina_id,
-    ]);
-    itens.push({ ...t, disciplina: rows[0], vagas_restantes: t.vagas_totais - t.vagas_ocupadas });
-  }
+  const itens = turmas.map((t) => ({ ...t, vagas_restantes: t.vagas_totais - t.vagas_ocupadas }));
 
   res.json({ pagina, tamanho, itens });
 });

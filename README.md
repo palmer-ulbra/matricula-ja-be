@@ -59,6 +59,8 @@ Só o Postgres — a autenticação é do próprio app (JWT + bcrypt). Basta apo
 
 ## Vercel
 
+Produção: **https://matricula-ja-be.vercel.app/api** (rotas em `/api/v1/...`).
+
 `api/index.ts` exporta o app Express e o `vercel.json` manda tudo para ele.
 Variáveis de ambiente do projeto: `DATABASE_URL` (pooler) e `JWT_SECRET`.
 
