@@ -6,6 +6,15 @@ Node + TypeScript + Express + Postgres com SQL cru (sem ORM).
 A especificação é o oráculo: `qualidade-e-testes-de-software/app/especificacao.md`.
 Quando o código e a spec discordarem, a spec está certa.
 
+## Acesso (produção)
+
+| | URL |
+| --- | --- |
+| App (front) | https://matricula-ja.vercel.app/login |
+| API | https://matricula-ja-be.vercel.app/api/v1 |
+
+Entre com `marina@ulbra.br` / `senha123` (demais credenciais abaixo).
+
 ## Rodar local
 
 ```bash
