@@ -67,13 +67,18 @@ export function criarMatricula(usuario: Usuario, turmaId: number, agora = new Da
           and t.periodo_letivo_id = $2`,
       [usuario.id, periodo.id],
     );
-    const conflito = ativas.rows.find((t) => horariosChocam(t, turma));
+    const conflito = ativas.rows.find((t) => {
+      return horariosChocam(t, turma);
+    });
     if (conflito) throw erroChoque(conflito);
 
     // RN-5 · créditos do semestre
     const total =
-      creditosDoSemestre(ativas.rows.map((t) => ({ estado: 'CONFIRMADA' as const, creditos: t.creditos }))) +
-      turma.creditos;
+      creditosDoSemestre(
+        ativas.rows.map((t) => {
+          return { estado: 'CONFIRMADA' as const, creditos: t.creditos };
+        }),
+      ) + turma.creditos;
     if (total > MAX_CREDITOS) throw erroLimiteDeCreditos(total);
 
     // RN-1 · vaga (última, porque é a única que altera contador)

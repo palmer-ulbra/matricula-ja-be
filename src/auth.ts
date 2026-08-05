@@ -6,8 +6,9 @@ import type { Perfil, Usuario } from './tipos.js';
 const segredo = process.env.JWT_SECRET;
 if (!segredo) throw new Error('JWT_SECRET não configurado — copie .env.example para .env');
 
-export const assinarToken = (u: Usuario) =>
-  jwt.sign({ sub: String(u.id), perfil: u.perfil, curso: u.curso }, segredo, { expiresIn: '8h' });
+export const assinarToken = (u: Usuario) => {
+  return jwt.sign({ sub: String(u.id), perfil: u.perfil, curso: u.curso }, segredo, { expiresIn: '8h' });
+};
 
 /** Exige token válido. Sem ele, 401 (RN-6). */
 export const exigeAuth: RequestHandler = (req, _res, next) => {
@@ -39,4 +40,6 @@ export function usuarioDe(req: Request): Usuario {
   return req.usuario;
 }
 
-export const ehCoordenacao = (u: Usuario) => u.perfil === 'COORDENADOR' || u.perfil === 'ADMINISTRADOR';
+export const ehCoordenacao = (u: Usuario) => {
+  return u.perfil === 'COORDENADOR' || u.perfil === 'ADMINISTRADOR';
+};

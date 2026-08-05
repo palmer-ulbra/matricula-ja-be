@@ -16,11 +16,15 @@ export async function consultarAprovacao(alunoId: number, disciplinaId: number):
       disciplinaId,
       'APROVADO',
     ])
-    .then((r) => r.rowCount! > 0);
+    .then((r) => {
+      return r.rowCount! > 0;
+    });
 
-  const expirou = new Promise<never>((_, rejeita) =>
-    setTimeout(() => rejeita(new Error('timeout')), TIMEOUT_MS).unref(),
-  );
+  const expirou = new Promise<never>((_, rejeita) => {
+    setTimeout(() => {
+      rejeita(new Error('timeout'));
+    }, TIMEOUT_MS).unref();
+  });
 
   try {
     return await Promise.race([consulta, expirou]);

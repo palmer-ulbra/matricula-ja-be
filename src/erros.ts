@@ -18,13 +18,18 @@ export class ErroDaApi extends Error {
   }
 }
 
-export const semToken = () => new ErroDaApi(401, 'NAO_AUTENTICADO', 'RN-6', 'Token ausente ou inválido');
+export const semToken = () => {
+  return new ErroDaApi(401, 'NAO_AUTENTICADO', 'RN-6', 'Token ausente ou inválido');
+};
 
-export const semPermissao = () =>
-  new ErroDaApi(403, 'SEM_PERMISSAO', 'RN-6', 'Perfil sem permissão para este recurso');
+export const semPermissao = () => {
+  return new ErroDaApi(403, 'SEM_PERMISSAO', 'RN-6', 'Perfil sem permissão para este recurso');
+};
 
-export const naoEncontrado = (recurso: string) =>
-  new ErroDaApi(404, 'NAO_ENCONTRADO', null, `${recurso} não encontrado`);
+export const naoEncontrado = (recurso: string) => {
+  return new ErroDaApi(404, 'NAO_ENCONTRADO', null, `${recurso} não encontrado`);
+};
 
-export const corpoInvalido = (detalhe: string) =>
-  new ErroDaApi(400, 'CORPO_INVALIDO', null, `Corpo da requisição inválido: ${detalhe}`);
+export const corpoInvalido = (detalhe: string) => {
+  return new ErroDaApi(400, 'CORPO_INVALIDO', null, `Corpo da requisição inválido: ${detalhe}`);
+};

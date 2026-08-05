@@ -12,7 +12,12 @@ export const rotas = Router();
 /** Valida o corpo com zod; falha vira 400 no formato de erro da spec §6. */
 function corpo<T extends z.ZodType>(schema: T, valor: unknown): z.infer<T> {
   const r = schema.safeParse(valor);
-  if (!r.success) throw corpoInvalido(r.error.issues.map((i) => `${i.path.join('.')} ${i.message}`).join('; '));
+  if (!r.success) {
+    const detalhes = r.error.issues.map((i) => {
+      return `${i.path.join('.')} ${i.message}`;
+    });
+    throw corpoInvalido(detalhes.join('; '));
+  }
   return r.data;
 }
 
@@ -24,7 +29,9 @@ const paginacao = (q: Record<string, unknown>) => {
 
 // ── Público ─────────────────────────────────────────────────────────────────
 
-rotas.get('/health', (_req, res) => res.json({ status: 'ok' }));
+rotas.get('/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
 
 rotas.post('/auth/login', async (req, res) => {
   const { email, senha } = corpo(z.object({ email: z.string().email(), senha: z.string().min(1) }), req.body);
@@ -103,7 +110,9 @@ rotas.get('/turmas', async (req, res) => {
     [curso, busca, tamanho, offset],
   );
 
-  const itens = turmas.map((t) => ({ ...t, vagas_restantes: t.vagas_totais - t.vagas_ocupadas }));
+  const itens = turmas.map((t) => {
+    return { ...t, vagas_restantes: t.vagas_totais - t.vagas_ocupadas };
+  });
 
   res.json({ pagina, tamanho, itens });
 });
