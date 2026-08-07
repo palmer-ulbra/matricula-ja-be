@@ -16,34 +16,34 @@ test("soma os créditos das matrículas confirmadas", () => {
   expect(creditosDoSemestre(matriculas)).toBe(24);
 });
 
-// test("matrícula trancada não conta para o limite de créditos", () => {
-//   const matriculas = [
-//     { estado: "CONFIRMADA" as const, creditos: 20 },
-//     { estado: "TRANCADA" as const, creditos: 4 },
-//   ];
+test("matrícula trancada não conta para o limite de créditos", () => {
+  const matriculas = [
+    { estado: "CONFIRMADA" as const, creditos: 20 },
+    { estado: "TRANCADA" as const, creditos: 4 },
+  ];
 
-//   expect(creditosDoSemestre(matriculas)).toBe(20);
-// });
+  expect(creditosDoSemestre(matriculas)).toBe(20);
+});
 
-// test("matrícula rejeitada não conta para o limite de créditos", () => {
-//   const matriculas = [
-//     { estado: "CONFIRMADA" as const, creditos: 12 },
-//     { estado: "REJEITADA" as const, creditos: 4 },
-//   ];
+test("matrícula rejeitada não conta para o limite de créditos", () => {
+  const matriculas = [
+    { estado: "CONFIRMADA" as const, creditos: 12 },
+    { estado: "REJEITADA" as const, creditos: 4 },
+  ];
 
-//   expect(creditosDoSemestre(matriculas)).toBe(12);
-// });
+  expect(creditosDoSemestre(matriculas)).toBe(12);
+});
 
-// test("matrícula pendente não conta para o limite de créditos", () => {
-//   const matriculas = [
-//     { estado: "CONFIRMADA" as const, creditos: 12 },
-//     { estado: "PENDENTE" as const, creditos: 4 },
-//   ];
+test("matrícula pendente não conta para o limite de créditos", () => {
+  const matriculas = [
+    { estado: "CONFIRMADA" as const, creditos: 12 },
+    { estado: "PENDENTE" as const, creditos: 4 },
+  ];
 
-//   expect(creditosDoSemestre(matriculas)).toBe(12);
-// });
+  expect(creditosDoSemestre(matriculas)).toBe(12);
+});
 
-// test("aluno com menos de 12 créditos é irregular", () => {
-//   expect(alunoIrregular(11)).toBe(true);
-//   expect(alunoIrregular(12)).toBe(false);
-// });
+test("aluno com menos de 12 créditos é irregular", () => {
+  expect(alunoIrregular(11)).toBe(true);
+  expect(alunoIrregular(12)).toBe(false);
+});
