@@ -90,10 +90,3 @@ src/dominio/matricula.ts criar e trancar, em transação, na ordem de avaliaçã
 src/servico-historico.ts dublê do serviço externo (spec §7)
 src/rotas.ts             todos os endpoints
 ```
-
-## Testes
-
-Não vêm no repositório de propósito: escrevê-los é o trabalho das aulas 2, 6, 8, 9, 10,
-11, 12, 14, 15 e 16.
-
-oi
