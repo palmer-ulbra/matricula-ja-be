@@ -3,8 +3,11 @@
 Backend da aplicação-base da disciplina **Qualidade e Testes de Software** (ULBRA 2026/2).
 Node + TypeScript + Express + Postgres com SQL cru (sem ORM).
 
-A especificação é o oráculo: `qualidade-e-testes-de-software/app/especificacao.md`.
-Quando o código e a spec discordarem, a spec está certa.
+📜 **As regras de negócio (RN-1 a RN-7) estão em [`docs/regras-de-negocio.md`](docs/regras-de-negocio.md)** —
+é o que as aulas citam por identificador, e onde você confere o comportamento esperado.
+
+As regras são o oráculo: quando o código e uma delas discordarem, quem está errado é o
+código.
 
 ## Acesso (produção)
 
