@@ -27,7 +27,9 @@ create table aluno (
   email      text not null unique,
   curso      text not null,
   senha_hash text not null,
-  perfil     text not null check (perfil in ('ALUNO', 'COORDENADOR', 'ADMINISTRADOR'))
+  perfil     text not null check (perfil in ('ALUNO', 'COORDENADOR', 'ADMINISTRADOR')),
+  -- RN-8: marcado pela coordenação. Eleva o teto de créditos de 24 para 30.
+  formando   boolean not null default false
 );
 
 create table disciplina (

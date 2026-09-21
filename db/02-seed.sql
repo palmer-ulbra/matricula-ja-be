@@ -13,13 +13,14 @@ insert into periodo_letivo (id, codigo, inicio_matricula, fim_matricula, ativo) 
   (2, '2026/1', '2026-01-05 00:00-03', '2026-03-10 23:59-03', false);
 
 -- ── Pessoas ────────────────────────────────────────────────────────────────
-insert into aluno (id, nome, email, curso, senha_hash, perfil) values
-  (1, 'Marina Alves',   'marina@ulbra.br',      'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ALUNO'),
-  (2, 'Bruno Costa',    'bruno@ulbra.br',       'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ALUNO'),
-  (3, 'Carla Dias',     'carla@ulbra.br',       'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ALUNO'),
-  (4, 'Diego Ramos',    'diego@ulbra.br',       'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ALUNO'),
-  (5, 'Helena Prado',   'coordenacao@ulbra.br', 'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'COORDENADOR'),
-  (6, 'Palmer Oliveira', 'admin@ulbra.br',       'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ADMINISTRADOR');
+-- Marina é a única marcada como formando (RN-8): teto de créditos 30, não 24.
+insert into aluno (id, nome, email, curso, senha_hash, perfil, formando) values
+  (1, 'Marina Alves',   'marina@ulbra.br',      'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ALUNO', true),
+  (2, 'Bruno Costa',    'bruno@ulbra.br',       'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ALUNO', false),
+  (3, 'Carla Dias',     'carla@ulbra.br',       'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ALUNO', false),
+  (4, 'Diego Ramos',    'diego@ulbra.br',       'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ALUNO', false),
+  (5, 'Helena Prado',   'coordenacao@ulbra.br', 'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'COORDENADOR', false),
+  (6, 'Palmer Oliveira', 'admin@ulbra.br',       'ADS', '$2b$10$wFFq1ZH2uRznvLIKDjZeNeLD1RSSDIw5hR.rPjuShI3pzXuKBooSO', 'ADMINISTRADOR', false);
 
 -- ── Disciplinas ────────────────────────────────────────────────────────────
 -- pré-requisito só um nível (RN-2): BD I → BD II, Cálculo I → II → III, e outros pares.

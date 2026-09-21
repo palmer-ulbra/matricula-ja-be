@@ -11,5 +11,13 @@ export default defineConfig({
     // paralelo faria um teste consumir a vaga que o outro espera encontrar.
     fileParallelism: false,
     testTimeout: 15_000,
+    // Aula 6. Sem `thresholds` de propósito: transformar cobertura em nota de corte é
+    // assunto da Aula 12 (quality gates), e aqui contradiria a tese da aula — o número
+    // sozinho não diz se algum comportamento foi verificado.
+    coverage: {
+      provider: 'v8',
+      reporter: ['text'],
+      include: ['src/dominio/**'],
+    },
   },
 });

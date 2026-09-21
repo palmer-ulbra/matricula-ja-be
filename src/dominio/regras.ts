@@ -2,6 +2,7 @@ import { ErroDaApi } from '../erros.js';
 import type { EstadoMatricula, PeriodoLetivo, Turma } from '../tipos.js';
 
 export const MAX_CREDITOS = 24;
+export const MAX_CREDITOS_FORMANDO = 30;
 export const MIN_CREDITOS_REGULAR = 12;
 
 /** `19:00:00` do Postgres vira `19:00` nas mensagens. */
@@ -63,8 +64,19 @@ export const alunoIrregular = (creditos: number) => {
   return creditos < MIN_CREDITOS_REGULAR;
 };
 
-export const erroLimiteDeCreditos = (total: number) => {
-  return new ErroDaApi(422, 'LIMITE_DE_CREDITOS', 'RN-5', `Limite de créditos atingido (${total}/${MAX_CREDITOS})`);
+// ── RN-8 · Formando ─────────────────────────────────────────────────────────
+/** Teto do período. Formando marcado pela coordenação sobe de 24 para 30. */
+export const limiteDeCreditos = (formando: boolean) => {
+  return formando ? MAX_CREDITOS_FORMANDO : MAX_CREDITOS;
+};
+
+/** Os dois tetos são inclusivos: bater no limite ainda matricula. */
+export const passouDoLimite = (total: number, formando: boolean) => {
+  return total > limiteDeCreditos(formando);
+};
+
+export const erroLimiteDeCreditos = (total: number, limite: number) => {
+  return new ErroDaApi(422, 'LIMITE_DE_CREDITOS', 'RN-5', `Limite de créditos atingido (${total}/${limite})`);
 };
 
 // ── RN-1 · Vaga ─────────────────────────────────────────────────────────────

@@ -1,9 +1,10 @@
 import type { PoolClient } from 'pg';
 import { emTransacao } from '../db.js';
 import { ErroDaApi, naoEncontrado, semPermissao } from '../erros.js';
+import { consultarAprovacao } from '../servico-historico.js';
 import type { PeriodoLetivo, Turma, Usuario } from '../tipos.js';
+import { verificarPreRequisito } from './pre-requisito.js';
 import {
-  MAX_CREDITOS,
   creditosDoSemestre,
   dentroDoPrazo,
   erroChoque,
@@ -12,10 +13,20 @@ import {
   erroLimiteDeCreditos,
   erroSemVaga,
   horariosChocam,
+  limiteDeCreditos,
+  passouDoLimite,
   temVaga,
 } from './regras.js';
 
-type TurmaComDisciplina = Turma & { creditos: number; disciplina_codigo: string; disciplina_nome: string };
+type TurmaComDisciplina = Turma & {
+  creditos: number;
+  disciplina_codigo: string;
+  disciplina_nome: string;
+  // Nulos quando a disciplina da turma não tem pré-requisito (RN-2).
+  pre_requisito_id: number | null;
+  pre_requisito_codigo: string | null;
+  pre_requisito_nome: string | null;
+};
 
 async function periodoAtivo(c: PoolClient): Promise<PeriodoLetivo> {
   const { rows } = await c.query<PeriodoLetivo>('select * from periodo_letivo where ativo limit 1');
@@ -24,7 +35,7 @@ async function periodoAtivo(c: PoolClient): Promise<PeriodoLetivo> {
 }
 
 /**
- * Cria a matrícula aplicando RN-1..RN-7 na ordem de avaliação da especificação §5:
+ * Cria a matrícula aplicando RN-1..RN-8 na ordem de avaliação da especificação §5:
  * RN-4 → RN-6 → RN-7 → RN-2 → RN-3 → RN-5 → RN-1.
  * Tudo numa transação: a vaga só muda depois de todas as regras passarem.
  */
@@ -38,8 +49,11 @@ export function criarMatricula(usuario: Usuario, turmaId: number, agora = new Da
 
     // Trava a linha da turma: sem isso duas requisições simultâneas passam pela mesma vaga.
     const { rows } = await c.query<TurmaComDisciplina>(
-      `select t.*, d.creditos, d.codigo as disciplina_codigo, d.nome as disciplina_nome
-         from turma t join disciplina d on d.id = t.disciplina_id
+      `select t.*, d.creditos, d.codigo as disciplina_codigo, d.nome as disciplina_nome,
+              d.pre_requisito_id, p.codigo as pre_requisito_codigo, p.nome as pre_requisito_nome
+         from turma t
+         join disciplina d on d.id = t.disciplina_id
+         left join disciplina p on p.id = d.pre_requisito_id
         where t.id = $1 for update of t`,
       [turmaId],
     );
@@ -55,6 +69,20 @@ export function criarMatricula(usuario: Usuario, turmaId: number, agora = new Da
       [usuario.id, turmaId],
     );
     if (jaTem.rowCount) throw erroDuplicidade();
+
+    // RN-2 · pré-requisito. O serviço de histórico entra como colaborador injetado —
+    // é o que permite o domínio ser testado com um dublê no lugar dele.
+    await verificarPreRequisito(
+      turma.pre_requisito_id
+        ? {
+            id: turma.pre_requisito_id,
+            codigo: turma.pre_requisito_codigo!,
+            nome: turma.pre_requisito_nome!,
+          }
+        : null,
+      usuario.id,
+      consultarAprovacao,
+    );
 
     // RN-3 · choque de horário
     const ativas = await c.query<Turma & { creditos: number }>(
@@ -72,14 +100,17 @@ export function criarMatricula(usuario: Usuario, turmaId: number, agora = new Da
     });
     if (conflito) throw erroChoque(conflito);
 
-    // RN-5 · créditos do semestre
+    // RN-5 · créditos do semestre, com o teto da RN-8
+    // Lido do banco, não do token: a marcação de formando vale a partir da data em que é feita.
+    const marcacao = await c.query<{ formando: boolean }>('select formando from aluno where id = $1', [usuario.id]);
+    const formando = marcacao.rows[0]?.formando ?? false;
     const total =
       creditosDoSemestre(
         ativas.rows.map((t) => {
           return { estado: 'CONFIRMADA' as const, creditos: t.creditos };
         }),
       ) + turma.creditos;
-    if (total > MAX_CREDITOS) throw erroLimiteDeCreditos(total);
+    if (passouDoLimite(total, formando)) throw erroLimiteDeCreditos(total, limiteDeCreditos(formando));
 
     // RN-1 · vaga (última, porque é a única que altera contador)
     if (!temVaga(turma)) throw erroSemVaga();
