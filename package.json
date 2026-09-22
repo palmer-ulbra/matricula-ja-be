@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "build": "tsc",
     "start": "node dist/server.js",
     "db:reset": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/01-schema.sql -f db/02-seed.sql",
@@ -25,7 +27,11 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.6.2",
     "@types/pg": "^8.15.5",
+    "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^4.1.11",
+    "supertest": "^7.2.2",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
   }
 }

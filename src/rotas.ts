@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { assinarToken, ehCoordenacao, exigeAuth, exigePerfil, usuarioDe } from './auth.js';
 import { db } from './db.js';
 import { criarMatricula, trancarMatricula } from './dominio/matricula.js';
-import { MAX_CREDITOS, alunoIrregular, creditosDoSemestre } from './dominio/regras.js';
+import { alunoIrregular, creditosDoSemestre, limiteDeCreditos } from './dominio/regras.js';
 import { ErroDaApi, corpoInvalido, naoEncontrado, semPermissao } from './erros.js';
 
 export const rotas = Router();
@@ -190,11 +190,13 @@ rotas.get('/matriculas', async (req, res) => {
     [usuario.id, todas, usuario.perfil === 'COORDENADOR' ? usuario.curso : null],
   );
 
+  // O contador da tela reflete o teto de quem está olhando (RN-5 + RN-8).
+  const marcacao = await db.query<{ formando: boolean }>('select formando from aluno where id = $1', [usuario.id]);
   const creditos = creditosDoSemestre(rows);
   res.json({
     itens: rows,
     creditos,
-    limite: MAX_CREDITOS,
+    limite: limiteDeCreditos(marcacao.rows[0]?.formando ?? false),
     irregular: alunoIrregular(creditos),
   });
 });
