@@ -1,0 +1,216 @@
+openapi: 3.1.0
+info:
+  title: MatriculaJá API
+  version: 1.0.0
+  description: |
+    Contrato das rotas que a suíte de API cobre (Aula 9). A fonte é a especificação §6;
+    este arquivo é a versão executável dela. Rota fora daqui ainda não tem contrato.
+servers:
+  - url: http://localhost:3000/api/v1
+
+security:
+  - bearer: []
+
+paths:
+  /auth/login:
+    post:
+      summary: Autentica e devolve o token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Credenciais' }
+      responses:
+        '200':
+          description: Autenticado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sessao' }
+        '400': { $ref: '#/components/responses/Erro' }
+        '401': { $ref: '#/components/responses/Erro' }
+
+  /turmas:
+    get:
+      summary: Lista as turmas do período ativo (paginada)
+      parameters:
+        - { name: busca, in: query, schema: { type: string } }
+        - { name: curso, in: query, schema: { type: string } }
+        - { name: pagina, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: tamanho, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200':
+          description: Uma página de turmas
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaginaDeTurmas' }
+        '401': { $ref: '#/components/responses/Erro' }
+
+  /turmas/{id}:
+    get:
+      summary: Detalhe da turma, com vagas restantes
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: A turma
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TurmaDetalhe' }
+        '401': { $ref: '#/components/responses/Erro' }
+        '404': { $ref: '#/components/responses/Erro' }
+
+  /matriculas:
+    post:
+      summary: Cria matrícula — aplica RN-1 a RN-7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NovaMatricula' }
+      responses:
+        '201':
+          description: Matrícula criada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Matricula' }
+        '400': { $ref: '#/components/responses/Erro' }
+        '401': { $ref: '#/components/responses/Erro' }
+        '403': { $ref: '#/components/responses/Erro' }
+        '409': { $ref: '#/components/responses/Erro' }
+        '422': { $ref: '#/components/responses/Erro' }
+
+  /matriculas/{id}:
+    delete:
+      summary: Tranca a matrícula (não apaga) — CONFIRMADA → TRANCADA
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Matrícula trancada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Matricula' }
+        '401': { $ref: '#/components/responses/Erro' }
+        '403': { $ref: '#/components/responses/Erro' }
+        '404': { $ref: '#/components/responses/Erro' }
+        '409': { $ref: '#/components/responses/Erro' }
+
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer }
+
+  responses:
+    Erro:
+      description: Recusa no formato único da spec §6
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Erro' }
+
+  schemas:
+    Erro:
+      type: object
+      required: [erro]
+      properties:
+        erro:
+          type: object
+          required: [codigo, regra, mensagem]
+          properties:
+            codigo: { type: string, example: TURMA_SEM_VAGA }
+            regra: { type: [string, 'null'], example: RN-1 }
+            mensagem: { type: string, example: Turma sem vaga disponível }
+
+    Credenciais:
+      type: object
+      required: [email, senha]
+      properties:
+        email: { type: string, format: email }
+        senha: { type: string, minLength: 1 }
+
+    Sessao:
+      type: object
+      required: [token, usuario]
+      properties:
+        token: { type: string }
+        usuario:
+          type: object
+          required: [id, perfil, curso, nome, email]
+          properties:
+            id: { type: integer }
+            perfil: { type: string, enum: [ALUNO, COORDENADOR, ADMINISTRADOR] }
+            curso: { type: [string, 'null'] }
+            nome: { type: string }
+            email: { type: string, format: email }
+
+    Horario:
+      type: string
+      pattern: '^\d{2}:\d{2}:\d{2}$'
+      example: '19:00:00'
+
+    Turma:
+      description: Campos que toda representação de turma entrega
+      type: object
+      required: [id, codigo, vagas_totais, vagas_ocupadas, vagas_restantes, dia_semana, hora_inicio, hora_fim, situacao]
+      properties:
+        id: { type: integer }
+        codigo: { type: string, example: ENG-101-A }
+        vagas_totais: { type: integer, minimum: 0 }
+        vagas_ocupadas: { type: integer, minimum: 0 }
+        vagas_restantes: { type: integer, minimum: 0 }
+        dia_semana: { type: string, enum: [seg, ter, qua, qui, sex, sab] }
+        hora_inicio: { $ref: '#/components/schemas/Horario' }
+        hora_fim: { $ref: '#/components/schemas/Horario' }
+        situacao: { type: string, enum: [ABERTA, FECHADA] }
+
+    TurmaResumo:
+      description: Item da listagem — a disciplina vem aninhada
+      allOf:
+        - $ref: '#/components/schemas/Turma'
+        - type: object
+          required: [disciplina]
+          properties:
+            disciplina:
+              type: object
+              required: [codigo, nome, creditos]
+              properties:
+                codigo: { type: string, example: ENG-101 }
+                nome: { type: string }
+                creditos: { type: integer, minimum: 1 }
+
+    PaginaDeTurmas:
+      type: object
+      required: [pagina, tamanho, itens]
+      properties:
+        pagina: { type: integer, minimum: 1 }
+        tamanho: { type: integer, minimum: 1, maximum: 100 }
+        itens:
+          type: array
+          items: { $ref: '#/components/schemas/TurmaResumo' }
+
+    TurmaDetalhe:
+      description: Detalhe — a disciplina vem em campos soltos
+      allOf:
+        - $ref: '#/components/schemas/Turma'
+        - type: object
+          required: [disciplina_codigo, disciplina_nome, creditos]
+          properties:
+            disciplina_codigo: { type: string }
+            disciplina_nome: { type: string }
+            creditos: { type: integer, minimum: 1 }
+
+    NovaMatricula:
+      type: object
+      required: [turma_id]
+      properties:
+        turma_id: { type: integer, minimum: 1 }
+
+    Matricula:
+      type: object
+      required: [id, aluno_id, turma_id, estado, criada_em, atualizada_em]
+      properties:
+        id: { type: integer }
+        aluno_id: { type: integer }
+        turma_id: { type: integer }
+        estado: { type: string, enum: [PENDENTE, CONFIRMADA, REJEITADA, TRANCADA] }
+        criada_em: { type: string, format: date-time }
+        atualizada_em: { type: string, format: date-time }
