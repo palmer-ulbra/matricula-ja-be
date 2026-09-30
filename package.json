@@ -10,7 +10,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "db:reset": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/01-schema.sql -f db/02-seed.sql",
-    "db:seed-volume": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/03-seed-volume.sql"
+    "db:seed-volume": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/03-seed-volume.sql",
+    "test:contract": "vitest run tests/contract"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
