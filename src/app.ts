@@ -1,11 +1,11 @@
 import "dotenv/config";
 import cors from "cors";
 import express, { type ErrorRequestHandler } from "express";
-import { ErroDaApi } from "./erros.js";
+import { ErroDaApi, corpoInvalido } from "./erros.js";
 import { rotas } from "./rotas.js";
 import "./tipos.js";
 
-const app = express();
+export const app = express();
 
 app.use(cors());
 app.use(express.json());
@@ -22,6 +22,11 @@ app.use((_req, res) => {
 });
 
 const tratarErro: ErrorRequestHandler = (err, _req, res, _next) => {
+  // Corpo com JSON quebrado: o express.json() lança SyntaxError antes da rota (spec §6: 400).
+  if (err instanceof SyntaxError && "body" in err) {
+    res.status(400).json(corpoInvalido("JSON malformado").corpo);
+    return;
+  }
   if (err instanceof ErroDaApi) {
     res.status(err.status).json(err.corpo);
     return;

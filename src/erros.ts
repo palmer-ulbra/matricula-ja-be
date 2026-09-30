@@ -27,7 +27,7 @@ export const semPermissao = () => {
 };
 
 export const naoEncontrado = (recurso: string) => {
-  return new ErroDaApi(404, 'NAO_ENCONTRADO', null, `${recurso} não encontrado`);
+  return new ErroDaApi(404, 'NAO_ENCONTRADO', null, `${recurso}: não encontrado(a)`);
 };
 
 export const corpoInvalido = (detalhe: string) => {

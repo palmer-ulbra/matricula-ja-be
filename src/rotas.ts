@@ -52,6 +52,11 @@ rotas.post('/auth/login', async (req, res) => {
 // ── Daqui para baixo, tudo exige token (RN-6) ───────────────────────────────
 rotas.use(exigeAuth);
 
+// Toda rota com `:id` passa aqui: id que não é número é recurso inexistente, não 500.
+rotas.param('id', (_req, _res, next, id) => {
+  next(/^\d+$/.test(id) ? undefined : naoEncontrado('Recurso'));
+});
+
 rotas.get('/periodos/ativo', async (_req, res) => {
   const { rows } = await db.query('select * from periodo_letivo where ativo limit 1');
   if (!rows[0]) throw naoEncontrado('Período letivo ativo');
