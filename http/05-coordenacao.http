@@ -1,0 +1,44 @@
+# 05 — Coordenação (perfil COORDENADOR)
+@api = http://localhost:3000/api/v1
+
+
+### 1) Login como coordenadora (rode este primeiro)
+# @name login
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "coordenacao@ulbra.br",
+  "senha": "senha123"
+}
+
+
+### 2) Relatório de ocupação das turmas
+GET {{api}}/relatorios/ocupacao
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 3) Todas as matrículas do curso (não só as próprias)
+GET {{api}}/matriculas
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 4) Aumentar as vagas da turma 1
+PATCH {{api}}/turmas/1
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "vagas_totais": 40
+}
+
+
+### 5) Reduzir abaixo do número de matriculados → 409 (RN-1)
+# A turma 4 (BD-101-B) tem 2 alunos matriculados. Tentar deixar só 1 vaga:
+PATCH {{api}}/turmas/4
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "vagas_totais": 1
+}

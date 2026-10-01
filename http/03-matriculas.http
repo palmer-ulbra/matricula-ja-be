@@ -1,0 +1,52 @@
+# 03 — Matrículas (perfil ALUNO)
+@api = http://localhost:3000/api/v1
+
+
+### 1) Login como aluno (rode este primeiro)
+# @name login
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "carla@ulbra.br",
+  "senha": "senha123"
+}
+
+
+### 2) Procurar uma turma para se matricular
+# @name turmas
+GET {{api}}/turmas?busca=WEB
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 3) Matricular na primeira turma encontrada
+# Esperado: 201 e a matrícula criada.
+# Se vier 409, leia o "codigo" e a "regra" do erro: alguma regra de negócio barrou.
+# @name nova
+POST {{api}}/matriculas
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "turma_id": {{turmas.response.body.$.itens[0].id}}
+}
+
+
+### 4) Minhas matrículas, créditos e limite
+GET {{api}}/matriculas
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 5) Ver a matrícula criada no passo 3
+GET {{api}}/matriculas/{{nova.response.body.id}}
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 6) Trancar a matrícula criada no passo 3
+DELETE {{api}}/matriculas/{{nova.response.body.id}}
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 7) Meu histórico (aluno 3 é a Carla)
+GET {{api}}/alunos/3/historico
+Authorization: Bearer {{login.response.body.token}}

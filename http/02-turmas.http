@@ -1,0 +1,38 @@
+# 02 — Turmas
+# Contrato: docs/openapi.yaml. Confira se cada campo prometido veio na resposta.
+@api = http://localhost:3000/api/v1
+
+
+### 1) Login (rode este primeiro)
+# @name login
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "marina@ulbra.br",
+  "senha": "senha123"
+}
+
+
+### 2) Listar turmas do período ativo
+# Olhe um item de "itens". O contrato promete, entre outros:
+#   dia_semana, hora_inicio, hora_fim, vagas_restantes
+# Se algum sumir, o app do DCE quebra (é a situação da aula).
+# @name turmas
+GET {{api}}/turmas
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 3) Buscar turmas por texto (código ou nome)
+GET {{api}}/turmas?busca=banco
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 4) Paginação: página 2, 5 itens por página
+GET {{api}}/turmas?pagina=2&tamanho=5
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 5) Ver uma turma (usa o id da primeira turma da lista do passo 2)
+GET {{api}}/turmas/{{turmas.response.body.$.itens[0].id}}
+Authorization: Bearer {{login.response.body.token}}

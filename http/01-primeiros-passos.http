@@ -1,0 +1,20 @@
+# 01 — Primeiros passos
+# Endereço da API. Troque aqui se ela estiver rodando em outro lugar.
+@api = http://localhost:3000/api/v1
+
+
+### 1) A API está de pé?
+# Esperado: 200 e { "status": "ok" }
+GET {{api}}/health
+
+
+### 2) Login
+# Esperado: 200, um "token" e os dados do "usuario".
+# O token é o crachá: as outras rotas pedem ele no cabeçalho Authorization.
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "marina@ulbra.br",
+  "senha": "senha123"
+}

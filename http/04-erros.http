@@ -1,0 +1,59 @@
+# 04 — Quando dá errado
+# Todo erro vem no mesmo formato. Repare nos campos de cada resposta:
+# o status HTTP, o "codigo" e a "regra" (RN-x) que explicam o motivo.
+@api = http://localhost:3000/api/v1
+
+
+### 1) Login (rode este primeiro)
+# @name login
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "bruno@ulbra.br",
+  "senha": "senha123"
+}
+
+
+### 2) Senha errada → 401
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "bruno@ulbra.br",
+  "senha": "errada"
+}
+
+
+### 3) Sem token → 401
+GET {{api}}/turmas
+
+
+### 4) Corpo inválido (turma_id em texto) → 400
+POST {{api}}/matriculas
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "turma_id": "abc"
+}
+
+
+### 5) Turma que não existe → 404
+GET {{api}}/turmas/999999
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 6) Histórico de outro aluno → 403 (Bruno é o aluno 2, pediu o 1)
+GET {{api}}/alunos/1/historico
+Authorization: Bearer {{login.response.body.token}}
+
+
+### 7) Aluno tentando mudar vagas de turma → 403
+PATCH {{api}}/turmas/1
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "vagas_totais": 50
+}
