@@ -10,8 +10,9 @@ export const db = new pg.Pool({
   connectionString: url,
   // Supabase exige TLS e usa certificado próprio; local não usa TLS.
   ssl: local ? undefined : { rejectUnauthorized: false },
-  // Função serverless: uma conexão por instância, o pooler do Supabase cuida do resto.
-  max: local ? 10 : 1,
+  // Função serverless: poucas conexões por instância, o pooler do Supabase cuida do resto.
+  // Pelo menos 2: dentro de uma transação, o serviço de histórico pede outra conexão.
+  max: local ? 10 : 3,
 });
 
 /** Roda `fn` dentro de uma transação; devolve o resultado ou faz ROLLBACK e repropaga. */
