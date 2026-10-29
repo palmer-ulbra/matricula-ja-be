@@ -154,8 +154,20 @@ rotas.get("/turmas", async (req, res) => {
     [curso, busca, tamanho, offset],
   );
 
-  const itens = turmas.map((t) => {
-    return { ...t, vagas_restantes: t.vagas_totais - t.vagas_ocupadas };
+  // const itens = turmas.map((t) => {
+  //   return { ...t, vagas_restantes: t.vagas_totais - t.vagas_ocupadas };
+  // });
+
+  const itens = turmas.map(({ dia_semana, hora_inicio, hora_fim, ...t }) => {
+    const horario = `${dia_semana} ${hora_inicio.slice(0, 5)}–${hora_fim.slice(0, 5)}`;
+    return {
+      ...t,
+      horario,
+      dia_semana,
+      hora_inicio,
+      hora_fim,
+      vagas_restantes: t.vagas_totais - t.vagas_ocupadas,
+    };
   });
 
   res.json({ pagina, tamanho, itens });

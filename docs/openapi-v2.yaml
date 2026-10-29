@@ -20,15 +20,15 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/Credenciais' }
+            schema: { $ref: "#/components/schemas/Credenciais" }
       responses:
-        '200':
+        "200":
           description: Autenticado
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Sessao' }
-        '400': { $ref: '#/components/responses/Erro' }
-        '401': { $ref: '#/components/responses/Erro' }
+              schema: { $ref: "#/components/schemas/Sessao" }
+        "400": { $ref: "#/components/responses/Erro" }
+        "401": { $ref: "#/components/responses/Erro" }
 
   /turmas:
     get:
@@ -36,15 +36,23 @@ paths:
       parameters:
         - { name: busca, in: query, schema: { type: string } }
         - { name: curso, in: query, schema: { type: string } }
-        - { name: pagina, in: query, schema: { type: integer, minimum: 1, default: 1 } }
-        - { name: tamanho, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - {
+            name: pagina,
+            in: query,
+            schema: { type: integer, minimum: 1, default: 1 },
+          }
+        - {
+            name: tamanho,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 100, default: 20 },
+          }
       responses:
-        '200':
+        "200":
           description: Uma página de turmas
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/PaginaDeTurmas' }
-        '401': { $ref: '#/components/responses/Erro' }
+              schema: { $ref: "#/components/schemas/PaginaDeTurmas" }
+        "401": { $ref: "#/components/responses/Erro" }
 
   /turmas/{id}:
     get:
@@ -52,13 +60,13 @@ paths:
       parameters:
         - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
-        '200':
+        "200":
           description: A turma
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/TurmaDetalhe' }
-        '401': { $ref: '#/components/responses/Erro' }
-        '404': { $ref: '#/components/responses/Erro' }
+              schema: { $ref: "#/components/schemas/TurmaDetalhe" }
+        "401": { $ref: "#/components/responses/Erro" }
+        "404": { $ref: "#/components/responses/Erro" }
 
   /matriculas:
     post:
@@ -67,18 +75,18 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/NovaMatricula' }
+            schema: { $ref: "#/components/schemas/NovaMatricula" }
       responses:
-        '201':
+        "201":
           description: Matrícula criada
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Matricula' }
-        '400': { $ref: '#/components/responses/Erro' }
-        '401': { $ref: '#/components/responses/Erro' }
-        '403': { $ref: '#/components/responses/Erro' }
-        '409': { $ref: '#/components/responses/Erro' }
-        '422': { $ref: '#/components/responses/Erro' }
+              schema: { $ref: "#/components/schemas/Matricula" }
+        "400": { $ref: "#/components/responses/Erro" }
+        "401": { $ref: "#/components/responses/Erro" }
+        "403": { $ref: "#/components/responses/Erro" }
+        "409": { $ref: "#/components/responses/Erro" }
+        "422": { $ref: "#/components/responses/Erro" }
 
   /matriculas/{id}:
     delete:
@@ -86,15 +94,15 @@ paths:
       parameters:
         - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
-        '200':
+        "200":
           description: Matrícula trancada
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Matricula' }
-        '401': { $ref: '#/components/responses/Erro' }
-        '403': { $ref: '#/components/responses/Erro' }
-        '404': { $ref: '#/components/responses/Erro' }
-        '409': { $ref: '#/components/responses/Erro' }
+              schema: { $ref: "#/components/schemas/Matricula" }
+        "401": { $ref: "#/components/responses/Erro" }
+        "403": { $ref: "#/components/responses/Erro" }
+        "404": { $ref: "#/components/responses/Erro" }
+        "409": { $ref: "#/components/responses/Erro" }
 
 components:
   securitySchemes:
@@ -105,7 +113,7 @@ components:
       description: Recusa no formato único da spec §6
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Erro' }
+          schema: { $ref: "#/components/schemas/Erro" }
 
   schemas:
     Erro:
@@ -117,7 +125,7 @@ components:
           required: [codigo, regra, mensagem]
           properties:
             codigo: { type: string, example: TURMA_SEM_VAGA }
-            regra: { type: [string, 'null'], example: RN-1 }
+            regra: { type: [string, "null"], example: RN-1 }
             mensagem: { type: string, example: Turma sem vaga disponível }
 
     Credenciais:
@@ -138,19 +146,30 @@ components:
           properties:
             id: { type: integer }
             perfil: { type: string, enum: [ALUNO, COORDENADOR, ADMINISTRADOR] }
-            curso: { type: [string, 'null'] }
+            curso: { type: [string, "null"] }
             nome: { type: string }
             email: { type: string, format: email }
 
     Horario:
       type: string
       pattern: '^\d{2}:\d{2}:\d{2}$'
-      example: '19:00:00'
+      example: "19:00:00"
 
     Turma:
       description: Campos que toda representação de turma entrega
       type: object
-      required: [id, codigo, vagas_totais, vagas_ocupadas, vagas_restantes, dia_semana, hora_inicio, hora_fim, situacao]
+      required:
+        [
+          id,
+          codigo,
+          vagas_totais,
+          vagas_ocupadas,
+          vagas_restantes,
+          dia_semana,
+          hora_inicio,
+          hora_fim,
+          situacao,
+        ]
       properties:
         id: { type: integer }
         codigo: { type: string, example: ENG-101-A }
@@ -158,15 +177,15 @@ components:
         vagas_ocupadas: { type: integer, minimum: 0 }
         vagas_restantes: { type: integer, minimum: 0 }
         dia_semana: { type: string, enum: [seg, ter, qua, qui, sex, sab] }
-        hora_inicio: { $ref: '#/components/schemas/Horario' }
-        hora_fim: { $ref: '#/components/schemas/Horario' }
+        hora_inicio: { $ref: "#/components/schemas/Horario", deprecated: true }
+        hora_fim: { $ref: "#/components/schemas/Horario" }
         situacao: { type: string, enum: [ABERTA, FECHADA] }
-        sala: { type: string, example: 'Prédio 11, sala 203' }
+        sala: { type: string, example: "Prédio 11, sala 203" }
 
     TurmaResumo:
       description: Item da listagem — a disciplina vem aninhada
       allOf:
-        - $ref: '#/components/schemas/Turma'
+        - $ref: "#/components/schemas/Turma"
         - type: object
           required: [disciplina]
           properties:
@@ -186,12 +205,12 @@ components:
         tamanho: { type: integer, minimum: 1, maximum: 100 }
         itens:
           type: array
-          items: { $ref: '#/components/schemas/TurmaResumo' }
+          items: { $ref: "#/components/schemas/TurmaResumo" }
 
     TurmaDetalhe:
       description: Detalhe — a disciplina vem em campos soltos
       allOf:
-        - $ref: '#/components/schemas/Turma'
+        - $ref: "#/components/schemas/Turma"
         - type: object
           required: [disciplina_codigo, creditos]
           properties:
@@ -202,7 +221,7 @@ components:
       type: object
       required: [turma_id, periodo_id]
       properties:
-        turma_id: { type: string, example: '15' }
+        turma_id: { type: string, example: "15" }
         periodo_id: { type: integer, minimum: 1 }
         observacao: { type: string, maxLength: 200 }
 
@@ -213,6 +232,10 @@ components:
         id: { type: integer }
         aluno_id: { type: integer }
         turma_id: { type: integer }
-        estado: { type: string, enum: [PENDENTE, CONFIRMADA, REJEITADA, TRANCADA, EM_ESPERA] }
+        estado:
+          {
+            type: string,
+            enum: [PENDENTE, CONFIRMADA, REJEITADA, TRANCADA, EM_ESPERA],
+          }
         criada_em: { type: string, format: date-time }
         atualizada_em: { type: string, format: date-time }
